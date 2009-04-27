@@ -30,6 +30,17 @@ describe WorkerBee do
       WorkerBee.run(:second)
       execution_path.should == [:first, :second]
     end
+
+    it "should handle diamond dependencies correctly" do
+      execution_path = []
+      WorkerBee.work(:sammich, :meat, :bread) { execution_path << :sammich }
+      WorkerBee.work(:meat, :clean) { execution_path << :meat }
+      WorkerBee.work(:bread, :clean) { execution_path << :bread }
+      WorkerBee.work(:clean) { execution_path << :clean }
+
+      WorkerBee.run(:sammich)
+      execution_path.should == [:clean, :meat, :bread, :sammich]
+    end
   end
 
   describe "work" do
