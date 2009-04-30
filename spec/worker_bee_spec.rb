@@ -51,7 +51,21 @@ describe WorkerBee do
       execution_path.should == [:clean, :meat, :bread, :sammich]
     end
 
-    it "should print the correct output"
+    it "should print the correct output" do
+      io = StringIO.new
+      WorkerBee.should_receive(:io_stream).and_return(io)
+
+      execution_path = []
+      WorkerBee.work(:sammich, :meat, :bread) { execution_path << :sammich }
+      WorkerBee.work(:meat, :clean) { execution_path << :meat }
+      WorkerBee.work(:bread, :clean) { execution_path << :bread }
+      WorkerBee.work(:clean) { execution_path << :clean }
+
+      WorkerBee.run(:sammich)
+
+      debugger
+      puts "ok"
+    end
   end
 
   describe "work" do
