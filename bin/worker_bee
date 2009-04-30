@@ -1,3 +1,18 @@
 #!/usr/bin/env ruby
 
-abort "you need to write me"
+# Kinda ghetto, but hey.
+require File.dirname(__FILE__) + "/../lib/worker_bee"
+
+command_file = "./Beefile"
+if !File.exist?(command_file)
+  abort "Could not find a Beefile to run."
+end
+
+if ARGV.size != 1
+  abort "Usage: worker_bee <taskname>"
+end
+
+load command_file
+
+# Hell yeah we trust user input.
+WorkerBee.run(ARGV[0].to_sym)

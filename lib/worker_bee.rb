@@ -11,6 +11,10 @@ class WorkerBee
     instance_eval(&block)
   end
 
+  def self.io_stream
+    STDOUT
+  end
+
   def self.reset_work
     @@work = {}
   end
@@ -22,7 +26,7 @@ class WorkerBee
 
   def self.execute(name, level)
     current = @@work[name]
-    raise StandardError, "#{name} is not a valid task!" if current.nil?
+    raise ArgumentError, "#{name} is not a valid task!" if current.nil?
 
     # TODO(dbalatero): synchronize this
     if @@current_run[name]
@@ -38,6 +42,7 @@ class WorkerBee
     end
 
     # Finally, run this task.
+    io_stream.puts("  " * level) + "running #{name}"
     current.work.call
 
     # TODO(dbalatero): synchronize this.

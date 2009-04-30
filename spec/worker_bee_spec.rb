@@ -1,6 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 
 describe WorkerBee do
+  before(:each) do
+    # Have a clean state each test.
+    WorkerBee.reset_work
+  end
+
   describe "recipe" do
     it "should require a block of code to be passed in" do
       lambda { WorkerBee.recipe }.should raise_error(ArgumentError)
@@ -22,6 +27,10 @@ describe WorkerBee do
       run_count.should == 1
     end
 
+    it "should raise an error if an invalid task is run" do
+      lambda { WorkerBee.run(:nonexistent) }.should raise_error(ArgumentError)
+    end
+
     it "should execute dependencies in order" do
       execution_path = []
       WorkerBee.work(:first) { execution_path << :first }
@@ -31,7 +40,7 @@ describe WorkerBee do
       execution_path.should == [:first, :second]
     end
 
-    it "should handle diamond dependencies correctly" do
+    it "should handle diamond dependencies correctly, without re-execution" do
       execution_path = []
       WorkerBee.work(:sammich, :meat, :bread) { execution_path << :sammich }
       WorkerBee.work(:meat, :clean) { execution_path << :meat }
@@ -41,14 +50,11 @@ describe WorkerBee do
       WorkerBee.run(:sammich)
       execution_path.should == [:clean, :meat, :bread, :sammich]
     end
+
+    it "should print the correct output"
   end
 
   describe "work" do
-    before(:each) do
-      # Have a clean state each test.
-      WorkerBee.reset_work
-    end
-
     it "should require a recipe block to be passed in" do
       lambda { WorkerBee.work(:name) }.should raise_error(ArgumentError)
     end
