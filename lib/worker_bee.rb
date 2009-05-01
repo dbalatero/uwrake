@@ -31,8 +31,11 @@ class WorkerBee
     # TODO(dbalatero): synchronize this
     if @@current_run[name]
       # One base case, in which we already ran this dep.
+      io_stream.puts(("  " * level) + "not running #{name} - already met dependency")
       return
     end
+
+    io_stream.puts(("  " * level) + "running #{name}")
     
     if !current.dependencies.empty?
       # Run the dependencies.
@@ -42,7 +45,6 @@ class WorkerBee
     end
 
     # Finally, run this task.
-    io_stream.puts("  " * level) + "running #{name}"
     current.work.call
 
     # TODO(dbalatero): synchronize this.

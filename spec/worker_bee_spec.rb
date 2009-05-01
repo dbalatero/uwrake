@@ -19,6 +19,11 @@ describe WorkerBee do
   end
 
   describe "run" do
+    before(:each) do
+      io = StringIO.new
+      WorkerBee.should_receive(:io_stream).any_number_of_times.and_return(io)
+    end
+
     it "should execute the code for given task name" do
       run_count = 0
       WorkerBee.work(:foo) { run_count += 1 }
@@ -52,9 +57,6 @@ describe WorkerBee do
     end
 
     it "should print the correct output" do
-      io = StringIO.new
-      WorkerBee.should_receive(:io_stream).and_return(io)
-
       execution_path = []
       WorkerBee.work(:sammich, :meat, :bread) { execution_path << :sammich }
       WorkerBee.work(:meat, :clean) { execution_path << :meat }
@@ -62,9 +64,6 @@ describe WorkerBee do
       WorkerBee.work(:clean) { execution_path << :clean }
 
       WorkerBee.run(:sammich)
-
-      debugger
-      puts "ok"
     end
   end
 
